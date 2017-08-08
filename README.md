@@ -43,7 +43,7 @@
 
 		Edit videos.csv and enter the path of the subtitle file next to the corresponding video title by changing it from "None". All entries need not be updated, ie. if subtitle file is not available for some video, then leave it as "None". Existing subtitles will be automatically updated. 
 
-		$ python upload_subtitles.py
+		$ python upload_subtitles.py --folder=<complete-path-to-transcripts-folder>
 
 		This will open a Google sign-in page in the browser. Sign-in with the correct GMail ID for which the subtitles need to be downloaded. 
 		This will upload the subtitles mentioned in videos.csv to YouTube.

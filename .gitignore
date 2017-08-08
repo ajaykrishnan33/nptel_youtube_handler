@@ -1,1 +1,5 @@
 client_secret.json
+subtitles/
+transcripts/
+videos.csv
+*.json
