@@ -39,7 +39,7 @@
 		$ python get_videos_list.py
 
 		This will open a Google sign-in page in the browser. Sign-in with the correct GMail ID for which the subtitles need to be downloaded. 
-		This will get a list of videos corresponding to the signed-in GMail ID which will be stored in "csv/videos.csv".
+		This will get a list of videos corresponding to the signed-in GMail ID which will be stored in videos.csv .
 
 		Edit videos.csv and enter the path of the subtitle file next to the corresponding video title by changing it from "None". All entries need not be updated, ie. if subtitle file is not available for some video, then leave it as "None". Existing subtitles will be automatically updated. 
 
