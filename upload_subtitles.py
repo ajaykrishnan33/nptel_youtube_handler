@@ -81,6 +81,7 @@ def list_captions(youtube, video_id):
 
 # Call the API's captions.insert method to upload a caption track.
 def upload_caption(youtube, video_id, language, name, file):
+    print "Inserting subtitle file"
     insert_result = youtube.captions().insert(
         part="snippet",
         body=dict(
@@ -91,7 +92,8 @@ def upload_caption(youtube, video_id, language, name, file):
                 isDraft=False
             )
         ),
-        media_body=file
+        media_body=file,
+        sync=True
     ).execute()
 
     id = insert_result["id"]
@@ -105,6 +107,7 @@ def upload_caption(youtube, video_id, language, name, file):
 
 # If a new binary file is present, update the track with the file.
 def update_caption(youtube, caption_id, file):
+    print "Updating subtitle file"
     update_result = youtube.captions().update(
         part="snippet",
         body=dict(
@@ -113,7 +116,8 @@ def update_caption(youtube, caption_id, file):
                 isDraft=False
             )
         ),
-        media_body=file
+        media_body=file,
+        sync=True
     ).execute()
 
     name = update_result["snippet"]["name"]
@@ -137,12 +141,22 @@ if __name__ == "__main__":
                     continue
                 video_id = row[0]
                 caption_list = list_captions(youtube, video_id)
-                if len(caption_list)==0:
+                
+                nptel_cap_id = -1
+                for i in range(len(caption_list)):
+                    if caption_list[i]["snippet"]["name"] == "NPTEL Official":
+                        nptel_cap_id = i
+                        break
+                if nptel_cap_id==-1:
                     upload_caption(youtube, video_id, "en", 'NPTEL Official', os.path.join(args.folder, transcript_file))
-                elif len(caption_list)==1:
-                    update_caption(youtube, caption_list[0]["id"], os.path.join(args.folder, transcript_file))
+                else:
+                    print ""
+                    print caption_list[nptel_cap_id]
+                    print ""
+                    update_caption(youtube, caption_list[nptel_cap_id]["id"], os.path.join(args.folder, transcript_file))
 
     except HttpError, e:
         print "An HTTP error %d occurred:\n%s" % (e.resp.status, e.content)
     else:
         print "Created and managed caption tracks."
+
