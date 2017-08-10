@@ -9,13 +9,7 @@ from apiclient.errors import HttpError
 from oauth2client.client import flow_from_clientsecrets
 from oauth2client.file import Storage
 from oauth2client.tools import argparser, run_flow
-
-try:
-    os.mkdir("subtitles")
-except:
-    pass
-
-OUTPUT_DIR = "./subtitles/"
+import json
 
 # The CLIENT_SECRETS_FILE variable specifies the name of a file that contains
 # the OAuth 2.0 information for this application, including its client_id and
@@ -58,7 +52,7 @@ def uploads_list_mine(service, **kwargs):
     ).execute()
 
     channel = results['items'][0]
-    return channel["contentDetails"]["relatedPlaylists"]["uploads"]
+    return channel["snippet"]["title"], channel["contentDetails"]["relatedPlaylists"]["uploads"]
 
 def get_videos_list(service, uploads_list_id):
     # Retrieve the list of videos uploaded to the authenticated user's channel.
@@ -86,7 +80,7 @@ def get_videos_list(service, uploads_list_id):
 
     return zip(videoIDList, videoNameList)
 
-def download_caption_for_video(service, video):
+def download_caption_for_video(service, video, output_dir):
     video_id = video[0]
     title = "_".join(video[1].split(" ")) + ".srt"
     results = service.captions().list(
@@ -105,20 +99,26 @@ def download_caption_for_video(service, video):
         tfmt="srt"
     ).execute()
 
-    with open(OUTPUT_DIR + title, "w") as f:
+    with open(output_dir + title, "w") as f:
         f.write(subtitle)
 
     return title
 
-def download_caption_for_videos(service, videos):
+def download_caption_for_videos(service, videos, channel_title):
+    output_dir = channel_title.replace(" ", "_") + "/"
+    try:
+        os.mkdir(output_dir)
+    except:
+        pass
+
     for v in videos:
         try:
-            title = download_caption_for_video(service, v)
+            title = download_caption_for_video(service, v, output_dir)
             print title
         except:
             print "error at : " + v[1]
 
 
-uploads_list_id = uploads_list_mine(youtube, part='snippet,contentDetails,statistics', mine=True)
+channel_title, uploads_list_id = uploads_list_mine(youtube, part='snippet,contentDetails,statistics', mine=True)
 videos = get_videos_list(youtube, uploads_list_id)
-download_caption_for_videos(youtube, videos)
+download_caption_for_videos(youtube, videos, channel_title)
